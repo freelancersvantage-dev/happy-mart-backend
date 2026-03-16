@@ -36,7 +36,6 @@ const corsOptions = {
     origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://happy-mart.store', 'http://happy-mart.store'],
     credentials: true
 };
-
 app.use(cors(corsOptions));
 
 // Body parser middleware
@@ -46,25 +45,15 @@ app.use(express.urlencoded({ extended: true }));
 // Static files for admin panel
 app.use('/admin', express.static(path.join(__dirname, 'admin-panel')));
 
-/// MongoDB connection - UPDATED VERSION
+// MongoDB connection - FIXED VERSION
 mongoose.connect(process.env.MONGODB_URI, {
-    serverSelectionTimeoutMS: 30000, // Try for 30 seconds
-    socketTimeoutMS: 45000, // Close sockets after 45 seconds
-    family: 4 // Force IPv4 (fixes many connection issues)
+    serverSelectionTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
+    family: 4
 })
-.then(() => {
-   })
 .then(() => {
     console.log('✅ MongoDB connected successfully');
     console.log(`📊 Database: ${mongoose.connection.name}`);
-})
-.catch(err => {
-    console.error('❌ MongoDB connection error:');
-    console.error('Error name:', err.name);
-    console.error('Error message:', err.message);
-    console.error('Error code:', err.code);
-     process.exit(1);
-});
     
     // Check products count after connection
     setTimeout(async () => {
@@ -82,10 +71,14 @@ mongoose.connect(process.env.MONGODB_URI, {
             console.log('⚠️ Could not check products count');
         }
     }, 1000);
-
-
+})
+.catch(err => {
+    console.error('❌ MongoDB connection error:');
+    console.error('Error name:', err.name);
+    console.error('Error message:', err.message);
+    console.error('Error code:', err.code);
     process.exit(1);
-
+});
 
 // API Routes
 app.use('/api/auth', authRoutes);
